@@ -11,7 +11,7 @@ const firebaseAuthConfig = {
       requiredDisplayName: false,
     },
   ],
-  signInSuccessfulUrl: "/",
+  signInSuccessUrl: "/",
 };
 
 const FirebaseAuth: FunctionComponent = () => {
@@ -24,6 +24,7 @@ const FirebaseAuth: FunctionComponent = () => {
       <StyledFirebaseAuth
         uiConfig={firebaseAuthConfig}
         firebaseAuth={firebase.auth()}
+        signInSuccessUrl=""
       />
     </div>
   ) : null;
