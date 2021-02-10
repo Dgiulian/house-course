@@ -1,20 +1,19 @@
 import { useState, useEffect, ChangeEvent } from "react";
 import { useForm } from "react-hook-form";
-// import { useMutation, gql } from "@apollo/client";
-// import { useRouter } from "next/router";
+import { useMutation, gql } from "@apollo/client";
+import { useRouter } from "next/router";
 import Link from "next/link";
-// import { Image } from "cloudinary-react";
+import { Image } from "cloudinary-react";
 import { SearchBox } from "./searchBox";
 // import {
 //   CreateHouseMutation,
 //   CreateHouseMutationVariables,
 // } from "src/generated/CreateHouseMutation";
-// import {
-//   UpdateHouseMutation,
-//   UpdateHouseMutationVariables,
-// } from "src/generated/UpdateHouseMutation";
-// import { CreateSignatureMutation } from "src/generated/CreateSignatureMutation";
-
+/* import {
+  UpdateHouseMutation,
+  UpdateHouseMutationVariables,
+} from "src/generated/UpdateHouseMutation"; */
+import { CreateSignatureMutation } from "src/generated/CreateSignatureMutation";
 interface IFormData {
   address: string;
   latitude: number;
@@ -23,6 +22,36 @@ interface IFormData {
   image: FileList;
 }
 interface IProps {}
+
+const SIGNATURE_MUTATION = gql`
+  mutation CreateSigatureMutation {
+    createImageSignature {
+      signature
+      timestamp
+    }
+  }
+`;
+interface IUploadImageResponse {
+  secure_url: string;
+}
+async function uploadImage(
+  image: File,
+  signature: string,
+  timestamp: number
+): Promise<IUploadImageResponse> {
+  const url = `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/upload`;
+  const formData = new FormData();
+  formData.append("file", image);
+  formData.append("signature", signature);
+  formData.append("timestamp", timestamp.toString());
+  formData.append("api_key", process.env.NEXT_PUBLIC_CLOUDINARY_KEY ?? "");
+
+  const response = await fetch(url, {
+    method: "POST",
+    body: formData,
+  });
+  return response.json();
+}
 
 export default function HouseForm({}: IProps) {
   const [submitting, setSubmitting] = useState(false);
@@ -37,7 +66,17 @@ export default function HouseForm({}: IProps) {
     defaultValues: {},
   });
   const address = watch("address");
-  const handleCreate = async (data: IFormData) => {};
+  const [createSignature] = useMutation<CreateSignatureMutation>(
+    SIGNATURE_MUTATION
+  );
+
+  const handleCreate = async (data: IFormData) => {
+    const { data: signatureData } = await createSignature();
+    if (signatureData) {
+      const { signature, timestamp } = signatureData.createImageSignature();
+      const imageDate = await uploadImage(data.image[0], signature, timestamp);
+    }
+  };
   const onSubmit = (data: IFormData) => {
     setSubmitting(true);
     handleCreate(data);
