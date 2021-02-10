@@ -16,4 +16,4 @@
 // import { getBoundsOfDistance } from "geolib";
 // import { Context, AuthorizedContext } from "./context";
 
-export {};
+export const HouseResolver = {};
