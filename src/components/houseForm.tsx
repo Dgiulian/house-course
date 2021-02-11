@@ -5,10 +5,10 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import { Image } from "cloudinary-react";
 import { SearchBox } from "./searchBox";
-// import {
-//   CreateHouseMutation,
-//   CreateHouseMutationVariables,
-// } from "src/generated/CreateHouseMutation";
+import {
+  CreateHouseMutation,
+  CreateHouseMutationVariables,
+} from "src/generated/CreateHouseMutation";
 /* import {
   UpdateHouseMutation,
   UpdateHouseMutationVariables,
@@ -28,6 +28,14 @@ const SIGNATURE_MUTATION = gql`
     createImageSignature {
       signature
       timestamp
+    }
+  }
+`;
+
+const CREATE_HOUSE_MUTATION = gql`
+  mutation CreateHouseMutation($input: HouseInput!) {
+    createHouse(input: $input) {
+      id
     }
   }
 `;
@@ -56,6 +64,7 @@ async function uploadImage(
 export default function HouseForm({}: IProps) {
   const [submitting, setSubmitting] = useState(false);
   const [previewImage, setPreviewImage] = useState<string>("");
+  const router = useRouter();
   const {
     register,
     handleSubmit,
@@ -69,12 +78,34 @@ export default function HouseForm({}: IProps) {
   const [createSignature] = useMutation<CreateSignatureMutation>(
     SIGNATURE_MUTATION
   );
+  const [createHouse] = useMutation<
+    CreateHouseMutation,
+    CreateHouseMutationVariables
+  >(CREATE_HOUSE_MUTATION);
 
   const handleCreate = async (data: IFormData) => {
     const { data: signatureData } = await createSignature();
     if (signatureData) {
-      const { signature, timestamp } = signatureData.createImageSignature();
+      const { signature, timestamp } = signatureData.createImageSignature;
       const imageDate = await uploadImage(data.image[0], signature, timestamp);
+      const { data: houseData } = await createHouse({
+        variables: {
+          input: {
+            address: data.address,
+            image: imageDate.secure_url,
+            coordinates: {
+              latitude: data.latitude,
+              longitude: data.longitude,
+            },
+            bedrooms: parseInt(data.bedrooms, 10),
+          },
+        },
+      });
+      if (houseData?.createHouse) {
+        router.push(`/houses/${houseData.createHouse.id}`);
+      } else {
+        console.error("An error has occured");
+      }
     }
   };
   const onSubmit = (data: IFormData) => {
