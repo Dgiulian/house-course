@@ -64,6 +64,11 @@ class House {
 }
 @Resolver()
 export class HouseResolver {
+  @Query((_returns) => House, { nullable: true })
+  async house(@Arg("id") id: string, @Ctx() ctx: Context) {
+    return ctx.prisma.house.findOne({ where: { id: parseInt(id) } });
+  }
+
   @Mutation((_returns) => House, { nullable: true })
   @Authorized()
   async createHouse(
