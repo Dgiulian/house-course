@@ -66,7 +66,9 @@ function HouseData({ id }: { id: string }) {
             />
             <p>{house.bedrooms} bedrooms</p>
           </div>
-          <div className="sm:w-full md:w-1/2">Single Map</div>
+          <div className="sm:w-full md:w-1/2">
+            <SingleMap house={house} />
+          </div>
         </div>
       }
     />
