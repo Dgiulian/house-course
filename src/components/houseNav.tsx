@@ -3,5 +3,7 @@
 // import Link from "next/link";
 // import { useAuth } from "src/auth/useAuth";
 // import { DeleteHouse, DeleteHouseVariables } from "src/generated/DeleteHouse";
-
-export {};
+function HouseNav() {
+  return null;
+}
+export default HouseNav;
