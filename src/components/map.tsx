@@ -11,9 +11,10 @@ import { HousesQuery_houses } from "src/generated/HousesQuery";
 interface IProps {
   setDataBounds: (bounds: string) => void;
   houses: HousesQuery_houses[];
+  highlightedId: string | null;
 }
 
-export default function Map({ setDataBounds, houses }: IProps) {
+export default function Map({ setDataBounds, houses, highlightedId }: IProps) {
   const mapRef = useRef<MapRef | null>(null);
   const [selected, setSelected] = useState<HousesQuery_houses | null>(null);
   const [viewport, setViewport] = useLocalState<ViewState>("viewport", {
@@ -54,13 +55,22 @@ export default function Map({ setDataBounds, houses }: IProps) {
             longitude={house.longitude}
             offsetTop={-15}
             offsetLeft={-15}
+            className={highlightedId === house.id ? `marker-active` : ""}
           >
             <button
               style={{ width: 30, height: 30, fontSize: 30 }}
               type="button"
               onClick={() => setSelected(house)}
             >
-              <img src="/home-solid.svg" alt={`house`} className="w-8" />
+              <img
+                src={
+                  highlightedId === house.id
+                    ? "/home-color.svg"
+                    : "/home-solid.svg"
+                }
+                alt={`house`}
+                className="w-8"
+              />
             </button>
           </Marker>
         ))}
