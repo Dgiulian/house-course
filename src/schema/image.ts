@@ -11,10 +11,10 @@ const cloudinary = require("cloudinary").v2;
 @ObjectType()
 class ImageSignature {
   @Field((_type) => String)
-  signature: string;
+  signature!: string;
 
   @Field((_tupe) => Int)
-  timestamp: number;
+  timestamp!: number;
 }
 
 export class ImageResolver {

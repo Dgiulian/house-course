@@ -10,9 +10,27 @@ interface IProps {
     userId: string;
   };
 }
+const DELETE_HOUSE_MUTATION = gql`
+  mutation DeleteHouse($id: String!) {
+    deleteHouse(id: $id)
+  }
+`;
+
 function HouseNav({ house }: IProps) {
   const { user } = useAuth();
+  const router = useRouter();
+  const [deleteHouse, { loading }] = useMutation<
+    DeleteHouse,
+    DeleteHouseVariables
+  >(DELETE_HOUSE_MUTATION);
   const canManage = !!user && user.uid === house.userId;
+
+  const handleDeleteHouse = async (id: string) => {
+    if (confirm("Are you sure to delete the house?")) {
+      await deleteHouse({ variables: { id } });
+      router.push("/");
+    }
+  };
   return (
     <>
       <Link href="/">
@@ -24,6 +42,14 @@ function HouseNav({ house }: IProps) {
           <Link href={`/houses/${house.id}/edit`}>
             <a>Edit</a>
           </Link>
+          {" | "}
+          <button
+            disabled={loading}
+            type="button"
+            onClick={() => handleDeleteHouse(house.id)}
+          >
+            <a>Delete</a>
+          </button>
         </>
       )}
     </>

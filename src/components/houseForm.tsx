@@ -35,7 +35,7 @@ interface IProps {
 }
 
 const SIGNATURE_MUTATION = gql`
-  mutation CreateSigatureMutation {
+  mutation CreateSignatureMutation {
     createImageSignature {
       signature
       timestamp

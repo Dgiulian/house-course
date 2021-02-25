@@ -26,7 +26,7 @@ const HOUSES_QUERY = gql`
 const parseBounds = (boundsString: string) => {
   let bounds;
   try {
-    bounds = JSON.parse(boundsString);
+    bounds = JSON.parse(boundsString) as BoundsArray;
   } catch (error) {
     console.log(`Error parsing bounds string: ${boundsString}`);
     bounds = [

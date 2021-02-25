@@ -125,7 +125,7 @@ export class HouseResolver {
   async updateHouse(
     @Arg("id") id: string,
     @Arg("input") input: HouseInput,
-    @Ctx() ctx: Context
+    @Ctx() ctx: AuthorizedContext
   ) {
     const houseId = parseInt(id, 10);
     if (!houseId) {
@@ -147,5 +147,23 @@ export class HouseResolver {
         bedrooms: input.bedrooms,
       },
     });
+  }
+  @Mutation((_returns) => Boolean, { nullable: false })
+  @Authorized()
+  async deleteHouse(@Arg("id") id: string, @Ctx() ctx: AuthorizedContext) {
+    const houseId = parseInt(id, 10);
+    if (!id) {
+      return false;
+    }
+    const house = await ctx.prisma.house.findOne({ where: { id: houseId } });
+    if (!house || house.userId !== ctx.uid) {
+      return false;
+    }
+    try {
+      await ctx.prisma.house.delete({ where: { id: houseId } });
+      return true;
+    } catch (error) {
+      return false;
+    }
   }
 }
