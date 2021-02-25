@@ -24,7 +24,16 @@ const HOUSES_QUERY = gql`
   }
 `;
 const parseBounds = (boundsString: string) => {
-  const bounds = JSON.parse(boundsString);
+  let bounds;
+  try {
+    bounds = JSON.parse(boundsString);
+  } catch (error) {
+    console.log(`Error parsing bounds string: ${boundsString}`);
+    bounds = [
+      [0, 0],
+      [0, 0],
+    ];
+  }
   return {
     sw: {
       latitude: bounds[0][1],

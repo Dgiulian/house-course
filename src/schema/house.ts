@@ -120,4 +120,32 @@ export class HouseResolver {
       take: 50,
     });
   }
+  @Mutation((_returns) => House, { nullable: true })
+  @Authorized()
+  async updateHouse(
+    @Arg("id") id: string,
+    @Arg("input") input: HouseInput,
+    @Ctx() ctx: Context
+  ) {
+    const houseId = parseInt(id, 10);
+    if (!houseId) {
+      return null;
+    }
+
+    const house = await ctx.prisma.house.findOne({ where: { id: houseId } });
+    if (!house || house.userId !== ctx.uid) {
+      return null;
+    }
+
+    return ctx.prisma.house.update({
+      where: { id: houseId },
+      data: {
+        address: input.address,
+        image: input.image,
+        latitude: input.coordinates.latitude,
+        longitude: input.coordinates.longitude,
+        bedrooms: input.bedrooms,
+      },
+    });
+  }
 }

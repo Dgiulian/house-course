@@ -58,6 +58,7 @@ function HouseData({ id }: { id: string }) {
       main={
         <div className="sm:block md:flex">
           <div className="sm:w-full md:w-1/2 p-4">
+            <HouseNav house={house} />
             <h2 className="text-3xl my-2">{house.address}</h2>
             <Image
               className="pb-2"
